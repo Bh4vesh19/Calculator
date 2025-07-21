@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enhanced Calculator Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles */
         * {
             margin: 0;
             padding: 0;
@@ -14,14 +12,14 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #1a1a2e 75%, #0a0a0a 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -38,10 +36,10 @@
                 0 0 100px rgba(255, 69, 0, 0.03);
             max-width: 450px;
             width: 100%;
-            position: relative; /* Crucial for panel positioning */
+            position: relative; /* Keep this for dropdown menu positioning */
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden; /* Ensures panels slide in smoothly without overflow */
+            overflow: hidden; /* Ensure content transitions smoothly */
         }
 
         .calculator-container:hover {
@@ -190,20 +188,37 @@
             line-height: 1.1;
             word-break: break-all;
             min-height: 55px;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.15), 0 0 50px rgba(255, 69, 0, 0.05); /* Added subtle glow */
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
             letter-spacing: -1px;
         }
 
-        .buttons-grid {
+        .buttons-grid, .converter-section {
+            padding-top: 20px; /* Add some top padding to separate from screen */
+            transition: all 0.4s ease-in-out;
+            transform: scale(1);
+            opacity: 1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            transition: all 0.3s ease;
         }
 
         .buttons-grid.scientific {
             grid-template-columns: repeat(5, 1fr);
             gap: 16px;
+        }
+        
+        /* New styles for showing/hiding sections */
+        .hidden-section {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            display: none; /* Hide when not active */
+        }
+
+        /* Override display for converter-section to be block for its internal flex/grid */
+        .converter-section:not(.hidden-section) {
+            display: flex; /* Or whatever layout you need for its children */
+            flex-direction: column;
         }
 
         .btn {
@@ -318,18 +333,18 @@
             transform: translateY(-3px);
         }
 
-        .btn.scientific-func { /* Changed from .btn.scientific to avoid conflict with mode class */
+        .btn.scientific {
             background: linear-gradient(145deg, #6a1b9a, #4a148c);
             font-size: 20px;
             border: 1px solid rgba(106, 27, 154, 0.3);
-            height: 70px; /* Adjusted height for scientific buttons */
+            height: 70px;
             box-shadow: 
                 8px 8px 25px rgba(0, 0, 0, 0.8),
                 -8px -8px 25px rgba(106, 27, 154, 0.05),
                 0 0 40px rgba(106, 27, 154, 0.15);
         }
 
-        .btn.scientific-func:hover {
+        .btn.scientific:hover {
             background: linear-gradient(145deg, #7a2baa, #5a1a9c);
             box-shadow: 
                 12px 12px 35px rgba(0, 0, 0, 0.9),
@@ -338,8 +353,7 @@
             transform: translateY(-3px);
         }
 
-        /* Panel Styles (History, Converter) */
-        .panel {
+        .panel { /* This class is now only for history panel */
             position: absolute;
             top: 0;
             left: 0;
@@ -349,20 +363,16 @@
             backdrop-filter: blur(25px);
             border-radius: 32px;
             padding: 32px;
-            transform: translateX(100%); /* Start off-screen to the right */
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 100;
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            pointer-events: none; /* Allows interaction only when active */
-            opacity: 0; /* Hide content until active */
         }
 
         .panel.active {
-            transform: translateX(0); /* Slide in */
-            pointer-events: all;
-            opacity: 1;
+            transform: translateX(0) scale(1);
         }
 
         .panel-header {
@@ -407,7 +417,7 @@
             flex: 1;
             overflow-y: auto;
             color: #ffffff;
-            max-height: 400px; /* Limits history height for smaller screens */
+            max-height: 400px;
         }
 
         .history-item {
@@ -419,11 +429,10 @@
             margin-bottom: 12px;
         }
 
-        .history-item:hover, .history-item:focus {
+        .history-item:hover {
             background: linear-gradient(135deg, rgba(255, 69, 0, 0.08), rgba(255, 69, 0, 0.04));
             transform: translateX(12px);
             box-shadow: 0 8px 25px rgba(255, 69, 0, 0.15);
-            outline: none; /* Remove default focus outline */
         }
 
         .history-expression {
@@ -461,9 +470,10 @@
         /* Converter Styles */
         .converter-controls {
             margin: 20px 0;
-            flex: 1; /* Allow controls to take up available space in the panel */
+            flex-grow: 1; /* Allow converter content to take available space */
             display: flex;
             flex-direction: column;
+            justify-content: center; /* Vertically center controls */
         }
 
         .converter-select, .converter-input {
@@ -477,12 +487,10 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 16px;
             font-weight: 500;
-            -webkit-appearance: none; /* For custom select arrow */
-            -moz-appearance: none;
-            appearance: none;
         }
 
         .converter-select {
+            appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 12px center;
@@ -504,7 +512,7 @@
             padding: 20px;
             color: #ffffff;
             font-size: 24px;
-            margin-top: auto; /* Push to bottom if content is short */
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: inset 6px 6px 15px rgba(0, 0, 0, 0.8);
             font-weight: 600;
@@ -522,7 +530,7 @@
             font-weight: bold;
         }
 
-        /* Responsive Design Breakpoints */
+        /* Enhanced Responsive Design */
         
         /* Large Desktop (1440px+) */
         @media (min-width: 1440px) {
@@ -530,16 +538,20 @@
                 max-width: 500px;
                 padding: 36px;
             }
+            
             .btn {
                 height: 85px;
                 font-size: 28px;
             }
+            
             .main-display {
                 font-size: 52px;
             }
+            
             .buttons-grid {
                 gap: 24px;
             }
+
             .buttons-grid.scientific {
                 gap: 18px;
             }
@@ -551,18 +563,14 @@
                 max-width: 470px;
                 padding: 34px;
             }
+            
             .btn {
                 height: 82px;
                 font-size: 27px;
             }
+            
             .main-display {
                 font-size: 50px;
-            }
-            .buttons-grid {
-                gap: 22px;
-            }
-            .buttons-grid.scientific {
-                gap: 17px;
             }
         }
         
@@ -572,21 +580,22 @@
                 max-width: 420px;
                 padding: 30px;
             }
+            
             .btn {
                 height: 75px;
                 font-size: 24px;
             }
+            
             .main-display {
                 font-size: 44px;
             }
+            
             .buttons-grid {
                 gap: 18px;
             }
+
             .buttons-grid.scientific {
                 gap: 14px;
-            }
-            .panel {
-                padding: 30px;
             }
         }
         
@@ -595,35 +604,39 @@
             body {
                 padding: 16px;
             }
+            
             .calculator-container {
                 max-width: 400px;
                 padding: 28px;
                 border-radius: 28px;
             }
+            
             .btn {
                 height: 70px;
                 font-size: 22px;
                 border-radius: 20px;
             }
+            
             .main-display {
                 font-size: 40px;
             }
+            
             .screen-container {
                 padding: 28px 24px;
                 min-height: 140px;
             }
-            .btn.scientific-func {
+            
+            .btn.scientific {
                 font-size: 18px;
                 height: 64px;
             }
+            
             .buttons-grid {
                 gap: 16px;
             }
+
             .buttons-grid.scientific {
                 gap: 12px;
-            }
-            .panel {
-                padding: 28px;
             }
         }
         
@@ -632,112 +645,113 @@
             body {
                 padding: 12px;
             }
+            
             .calculator-container {
                 padding: 24px;
-                margin: 8px; /* Give a bit of margin around the container */
+                margin: 8px;
                 border-radius: 24px;
-                max-width: 100%; /* Ensure it takes full width */
+                max-width: 100%;
             }
+
             .btn {
                 height: 65px;
                 font-size: 20px;
                 border-radius: 18px;
             }
+
             .main-display {
                 font-size: 36px;
             }
+            
             .history-display {
                 font-size: 16px;
             }
+            
             .screen-container {
                 padding: 24px 20px;
                 min-height: 120px;
                 border-radius: 20px;
             }
+            
             .calculator-title {
                 font-size: 20px;
             }
+            
             .menu-btn {
                 width: 44px;
                 height: 44px;
                 font-size: 22px;
             }
-            .btn.scientific-func {
+
+            .btn.scientific {
                 font-size: 16px;
                 height: 58px;
             }
+            
             .buttons-grid {
                 gap: 14px;
             }
+
             .buttons-grid.scientific {
                 gap: 10px;
             }
+            
             .dropdown-menu {
-                right: 0; /* Align to the right of the container */
+                right: -8px;
                 padding: 14px;
                 min-width: 180px;
             }
+            
             .dropdown-item {
                 padding: 14px 20px;
                 font-size: 15px;
             }
-            .panel {
-                padding: 24px;
-                border-radius: 24px;
-            }
-            .panel-title {
-                font-size: 20px;
-            }
-            .close-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-            .history-list, .converter-controls {
-                max-height: calc(100vh - 250px); /* Adjust max-height for panels on small screens */
-            }
         }
 
-        /* Small Mobile (320px - 375px) - Further refined for narrow screens */
+        /* Small Mobile (320px - 375px) */
         @media (max-width: 360px) {
             .calculator-container {
                 padding: 20px;
                 border-radius: 20px;
             }
+            
             .btn {
                 height: 60px;
                 font-size: 18px;
                 border-radius: 16px;
             }
+
             .main-display {
                 font-size: 32px;
             }
+            
             .screen-container {
                 padding: 22px 18px;
                 min-height: 110px;
                 border-radius: 18px;
             }
-            .btn.scientific-func {
+            
+            .btn.scientific {
                 font-size: 14px;
                 height: 54px;
             }
+
             .buttons-grid {
                 gap: 12px;
             }
+
             .buttons-grid.scientific {
                 gap: 8px;
             }
+            
             .calculator-title {
                 font-size: 18px;
             }
+            
             .menu-btn {
                 width: 40px;
                 height: 40px;
                 font-size: 20px;
-            }
-            .panel {
-                padding: 20px;
-                border-radius: 20px;
             }
         }
         
@@ -747,74 +761,74 @@
                 padding: 16px;
                 border-radius: 18px;
             }
+            
             .btn {
                 height: 55px;
                 font-size: 16px;
                 border-radius: 14px;
             }
+            
             .main-display {
                 font-size: 28px;
             }
+            
             .screen-container {
                 padding: 20px 16px;
                 min-height: 100px;
                 border-radius: 16px;
             }
-            .btn.scientific-func {
+            
+            .btn.scientific {
                 font-size: 12px;
                 height: 50px;
             }
+            
             .buttons-grid {
                 gap: 10px;
             }
+
             .buttons-grid.scientific {
                 gap: 6px;
             }
-            .dropdown-menu {
-                right: -4px; /* Adjust dropdown position for extremely small screens */
-            }
         }
         
-        /* Landscape orientation for mobile (adjusting for limited height) */
-        @media (max-height: 600px) and (orientation: landscape) {
+        /* Landscape orientation for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
             body {
                 padding: 8px;
             }
+            
             .calculator-container {
                 padding: 16px;
-                max-width: 95vw; /* Allow wider usage of screen */
-                max-height: 95vh;
+                max-width: 90vw;
+                max-height: 90vh;
             }
+            
             .btn {
                 height: 50px;
                 font-size: 18px;
             }
+            
             .main-display {
                 font-size: 28px;
             }
+            
             .screen-container {
                 padding: 16px;
                 min-height: 80px;
-                margin-bottom: 16px; /* Reduced margin */
             }
+            
             .buttons-grid {
                 gap: 10px;
             }
-            .btn.scientific-func {
+            
+            .btn.scientific {
                 height: 45px;
                 font-size: 16px;
             }
+
             .buttons-grid.scientific {
                 gap: 8px;
-            }
-            .panel {
-                padding: 16px;
-            }
-            .panel-header {
-                margin-bottom: 16px;
-            }
-            .history-list, .converter-controls {
-                max-height: calc(95vh - 120px); /* Adjust max-height for panels in landscape */
             }
         }
 
@@ -839,9 +853,8 @@
             animation: slideIn 0.6s ease-out;
         }
 
-        /* Apply fadeIn to buttons only on initial load or if explicitly triggered */
         .btn {
-            /* animation: fadeIn 0.4s ease-out; /* Removed for every button as it can be heavy */
+            animation: fadeIn 0.4s ease-out;
         }
 
         /* High contrast mode support */
@@ -849,6 +862,7 @@
             .calculator-container {
                 border: 2px solid #ffffff;
             }
+            
             .btn {
                 border: 2px solid #ffffff;
             }
@@ -875,11 +889,11 @@
     <div class="calculator-container" id="calculator">
         <div class="header">
             <div class="calculator-title">Calculator Pro</div>
-            <button class="menu-btn" id="menuBtn" aria-label="Menu">⋮</button>
+            <button class="menu-btn" id="menuBtn">⋮</button>
             <div class="dropdown-menu" id="dropdownMenu">
-                <button class="dropdown-item" onclick="toggleConverter()" aria-label="Open Unit Converter">📐 Unit Converter</button>
-                <button class="dropdown-item" onclick="toggleScientific()" aria-label="Toggle Scientific Mode">🧮 <span id="scientificToggleText">Scientific</span></button>
-                <button class="dropdown-item" onclick="toggleHistory()" aria-label="View Calculation History">📋 History</button>
+                <button class="dropdown-item" onclick="toggleConverterView()">📐 Unit Converter</button>
+                <button class="dropdown-item" onclick="toggleScientific()">🧮 <span id="scientificToggleText">Scientific</span></button>
+                <button class="dropdown-item" onclick="toggleHistory()">📋 History</button>
             </div>
         </div>
 
@@ -888,61 +902,81 @@
             <div class="main-display" id="mainDisplay">0</div>
         </div>
 
-        <div class="buttons-grid" id="buttonsGrid">
-            <button class="btn clear" onclick="clearAll()">AC</button>
-            <button class="btn" onclick="clearEntry()">CE</button>
-            <button class="btn" onclick="deleteLast()" aria-label="Delete Last Character">⌫</button>
-            <button class="btn operator" onclick="inputOperator('÷')" aria-label="Divide">÷</button>
+        <div id="mainContentArea">
+            <div class="buttons-grid" id="buttonsGrid">
+                <button class="btn clear" onclick="clearAll()">AC</button>
+                <button class="btn" onclick="clearEntry()">CE</button>
+                <button class="btn" onclick="deleteLast()">⌫</button>
+                <button class="btn operator" onclick="inputOperator('÷')">÷</button>
 
-            <button class="btn" onclick="inputNumber('7')">7</button>
-            <button class="btn" onclick="inputNumber('8')">8</button>
-            <button class="btn" onclick="inputNumber('9')">9</button>
-            <button class="btn operator" onclick="inputOperator('×')" aria-label="Multiply">×</button>
+                <button class="btn" onclick="inputNumber('7')">7</button>
+                <button class="btn" onclick="inputNumber('8')">8</button>
+                <button class="btn" onclick="inputNumber('9')">9</button>
+                <button class="btn operator" onclick="inputOperator('×')">×</button>
 
-            <button class="btn" onclick="inputNumber('4')">4</button>
-            <button class="btn" onclick="inputNumber('5')">5</button>
-            <button class="btn" onclick="inputNumber('6')">6</button>
-            <button class="btn operator" onclick="inputOperator('-')" aria-label="Subtract">−</button>
+                <button class="btn" onclick="inputNumber('4')">4</button>
+                <button class="btn" onclick="inputNumber('5')">5</button>
+                <button class="btn" onclick="inputNumber('6')">6</button>
+                <button class="btn operator" onclick="inputOperator('-')">−</button>
 
-            <button class="btn" onclick="inputNumber('1')">1</button>
-            <button class="btn" onclick="inputNumber('2')">2</button>
-            <button class="btn" onclick="inputNumber('3')">3</button>
-            <button class="btn operator" onclick="inputOperator('+')" aria-label="Add">+</button>
+                <button class="btn" onclick="inputNumber('1')">1</button>
+                <button class="btn" onclick="inputNumber('2')">2</button>
+                <button class="btn operator" onclick="inputNumber('3')">3</button>
+                <button class="btn operator" onclick="inputOperator('+')">+</button>
 
-            <button class="btn zero" onclick="inputNumber('0')">0</button>
-            <button class="btn" onclick="inputDecimal()">.</button>
-            <button class="btn equals" onclick="calculate()" aria-label="Equals">=</button>
+                <button class="btn zero" onclick="inputNumber('0')">0</button>
+                <button class="btn" onclick="inputDecimal()">.</button>
+                <button class="btn equals" onclick="calculate()">=</button>
+            </div>
+
+            <div class="converter-section hidden-section" id="converterSection">
+                <div class="panel-header">
+                    <div class="panel-title">Unit Converter</div>
+                    <button class="close-btn" onclick="toggleConverterView()">×</button>
+                </div>
+                <div class="converter-controls">
+                    <select class="converter-select" id="converterType" onchange="updateConverter()">
+                        <option value="length">Length</option>
+                        <option value="weight">Weight</option>
+                        <option value="temperature">Temperature</option>
+                        <option value="volume">Volume</option>
+                    </select>
+                    <select class="converter-select" id="fromUnit">
+                        <option value="meter">Meter (m)</option>
+                        <option value="kilometer">Kilometer (km)</option>
+                        <option value="centimeter">Centimeter (cm)</option>
+                        <option value="millimeter">Millimeter (mm)</option>
+                        <option value="inch">Inch (in)</option>
+                        <option value="foot">Foot (ft)</s</option>
+                        <option value="yard">Yard (yd)</option>
+                        <option value="mile">Mile (mi)</option>
+                    </select>
+                    <input type="number" class="converter-input" id="converterInput" placeholder="Enter value" oninput="convertValue()">
+                    <div class="conversion-arrow">↓</div>
+                    <select class="converter-select" id="toUnit">
+                        <option value="meter">Meter (m)</option>
+                        <option value="kilometer">Kilometer (km)</option>
+                        <option value="centimeter">Centimeter (cm)</option>
+                        <option value="millimeter">Millimeter (mm)</option>
+                        <option value="inch">Inch (in)</option>
+                        <option value="foot">Foot (ft)</option>
+                        <option value="yard">Yard (yd)</option>
+                        <option value="mile">Mile (mi)</option>
+                    </select>
+                    <div class="converter-result" id="converterResult">0</div>
+                </div>
+            </div>
         </div>
 
         <div class="panel" id="historyPanel">
             <div class="panel-header">
                 <div class="panel-title">History</div>
-                <button class="close-btn" onclick="toggleHistory()" aria-label="Close History">×</button>
+                <button class="close-btn" onclick="toggleHistory()">×</button>
             </div>
             <div class="history-list" id="historyList">
                 <div style="text-align: center; color: #666; margin-top: 50px;">No calculations yet</div>
             </div>
             <button class="clear-history-btn" onclick="clearHistory()">Clear History</button>
-        </div>
-
-        <div class="panel" id="converterPanel">
-            <div class="panel-header">
-                <div class="panel-title">Unit Converter</div>
-                <button class="close-btn" onclick="toggleConverter()" aria-label="Close Unit Converter">×</button>
-            </div>
-            <div class="converter-controls">
-                <select class="converter-select" id="converterType" onchange="updateConverter()">
-                    <option value="length">Length</option>
-                    <option value="weight">Weight</option>
-                    <option value="temperature">Temperature</option>
-                    <option value="volume">Volume</option>
-                </select>
-                <select class="converter-select" id="fromUnit"></select>
-                <input type="number" class="converter-input" id="converterInput" placeholder="Enter value" oninput="convertValue()" aria-label="Value to convert">
-                <div class="conversion-arrow">↓</div>
-                <select class="converter-select" id="toUnit"></select>
-                <div class="converter-result" id="converterResult">0</div>
-            </div>
         </div>
     </div>
 
@@ -956,63 +990,44 @@
                 this.shouldResetDisplay = false;
                 this.history = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
                 this.isScientificMode = false;
-                this.scientificButtons = []; // To keep track of added scientific buttons
+                this.isConverterMode = false; /* New state variable */
             }
 
-            // Enhanced precision arithmetic and formatting
+            // Enhanced precision arithmetic
             static formatResult(num) {
                 if (isNaN(num) || !isFinite(num)) return 'Error';
+                if (Math.abs(num) > 1e15) return num.toExponential(6);
+                if (Math.abs(num) < 1e-10 && num !== 0) return num.toExponential(6);
                 
-                // Use a library like Decimal.js or big.js for true precision in production for financial/scientific calcs
-                // For this example, we'll rely on toFixed/toPrecision for formatting, aware of JS float limitations
+                // Format with proper precision
+                const result = parseFloat(num.toPrecision(12));
                 
-                const precision = 10; // Number of significant digits to use for calculation intermediate steps
-                let resultNum = parseFloat(num.toPrecision(precision));
-
-                // Handle very large/small numbers with exponential notation
-                if (Math.abs(resultNum) >= 1e12 || (Math.abs(resultNum) < 1e-9 && resultNum !== 0)) {
-                    return resultNum.toExponential(6);
-                }
-                
-                // Adjust toFixed based on number of integer digits to avoid too many decimals
-                let formattedResult;
-                if (Math.abs(resultNum) >= 1) {
-                    // Limit total digits after decimal to 8, but don't force if fewer are needed
-                    formattedResult = resultNum.toFixed(Math.min(8, Math.max(0, precision - resultNum.toString().split('.')[0].length)));
-                } else {
-                    formattedResult = resultNum.toFixed(8); // For numbers less than 1, keep max 8 decimal places
-                }
-                
-                // Remove trailing zeros and decimal point if it's an integer
-                formattedResult = parseFloat(formattedResult).toString();
-
                 // Add comma separators for large numbers
-                if (Math.abs(parseFloat(formattedResult)) >= 1000) {
-                    const parts = formattedResult.split('.');
-                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                    return parts.join('.');
+                if (Math.abs(result) >= 1000) {
+                    return result.toLocaleString('en-US', {
+                        maximumFractionDigits: 8,
+                        useGrouping: true
+                    });
                 }
                 
-                return formattedResult;
+                return result.toString();
             }
 
             static calculate(prev, current, operator) {
-                const a = parseFloat(prev.replace(/,/g, '')); // Remove commas for calculation
-                const b = parseFloat(current.replace(/,/g, '')); // Remove commas for calculation
+                const a = parseFloat(prev);
+                const b = parseFloat(current);
                 
-                let result;
                 switch (operator) {
-                    case '+': result = a + b; break;
-                    case '-': result = a - b; break;
-                    case '×': result = a * b; break;
+                    case '+': return CalculatorState.formatResult(a + b);
+                    case '-': return CalculatorState.formatResult(a - b);
+                    case '×': return CalculatorState.formatResult(a * b);
                     case '÷': 
                         if (b === 0) throw new Error('Division by zero');
-                        result = a / b; break;
-                    case '^': result = Math.pow(a, b); break;
-                    case 'mod': result = a % b; break;
+                        return CalculatorState.formatResult(a / b);
+                    case '^': return CalculatorState.formatResult(Math.pow(a, b));
+                    case 'mod': return CalculatorState.formatResult(a % b); /* Added modulo */
                     default: throw new Error('Unknown operator');
                 }
-                return CalculatorState.formatResult(result);
             }
         }
 
@@ -1027,15 +1042,37 @@
         const buttonsGrid = document.getElementById('buttonsGrid');
         const calculator = document.getElementById('calculator');
         const scientificToggleText = document.getElementById('scientificToggleText');
+        const converterSection = document.getElementById('converterSection'); /* Get converter section */
 
         // Enhanced Display Functions
         function updateDisplay() {
-            mainDisplay.textContent = CalculatorState.formatResult(parseFloat(calc.currentInput)) || '0';
+            mainDisplay.textContent = formatDisplayValue(calc.currentInput || '0');
             if (calc.previousInput && calc.operator) {
-                historyDisplay.textContent = `${CalculatorState.formatResult(parseFloat(calc.previousInput))} ${calc.operator}`;
+                historyDisplay.textContent = `${formatDisplayValue(calc.previousInput)} ${calc.operator}`;
             } else {
                 historyDisplay.textContent = '';
             }
+        }
+
+        function formatDisplayValue(value) {
+            if (!value || value === '0') return '0';
+            const num = parseFloat(value);
+            if (isNaN(num)) return 'Error';
+            
+            // Scientific notation for very large/small numbers
+            if (Math.abs(num) >= 1e12 || (Math.abs(num) < 1e-6 && num !== 0)) {
+                return num.toExponential(6);
+            }
+            
+            // Regular formatting with commas for large numbers
+            if (Math.abs(num) >= 1000) {
+                return num.toLocaleString('en-US', {
+                    maximumFractionDigits: 8,
+                    useGrouping: true
+                });
+            }
+            
+            return num.toString();
         }
 
         // Enhanced Input Functions
@@ -1044,10 +1081,8 @@
                 calc.currentInput = num;
                 calc.shouldResetDisplay = false;
             } else {
-                // Limit input length to prevent overflow, considering comma separators
-                const currentRawInput = calc.currentInput.replace(/,/g, '');
-                if (currentRawInput.length < 15) {
-                    calc.currentInput = currentRawInput === '0' ? num : currentRawInput + num;
+                if (calc.currentInput.length < 15) {
+                    calc.currentInput = calc.currentInput === '0' ? num : calc.currentInput + num;
                 }
             }
             updateDisplay();
@@ -1058,7 +1093,7 @@
                 calc.currentInput = '0.';
                 calc.shouldResetDisplay = false;
             } else if (!calc.currentInput.includes('.')) {
-                calc.currentInput = (calc.currentInput.replace(/,/g, '') || '0') + '.';
+                calc.currentInput = (calc.currentInput || '0') + '.';
             }
             updateDisplay();
         }
@@ -1070,39 +1105,22 @@
                 calculate();
             }
             
-            // If previous input is empty but current input has a value, use it as previous
-            if (calc.previousInput === '' && calc.currentInput !== '') {
-                calc.previousInput = calc.currentInput;
-            } else if (calc.previousInput !== '' && calc.currentInput === '') {
-                // If an operator is pressed again without a new number, just change the operator
-                calc.operator = op;
-                updateDisplay(); // Update to show new operator
-                return;
-            }
-            
             calc.operator = op;
-            calc.currentInput = ''; // Clear current input for next number
-            calc.shouldResetDisplay = false; // Allow new input after operator
+            calc.previousInput = calc.currentInput || calc.previousInput;
+            calc.currentInput = '';
             updateDisplay();
         }
 
         function calculate() {
-            if (calc.previousInput === '' || calc.currentInput === '') {
-                // If only one number is present, pressing '=' just displays it clearly.
-                // Or if an operator was just pressed and no second number.
-                calc.shouldResetDisplay = true;
-                calc.previousInput = '';
-                calc.operator = '';
-                updateDisplay();
-                return;
-            }
+            if (calc.previousInput === '' || calc.currentInput === '' || calc.operator === '') return;
             
             try {
                 const result = CalculatorState.calculate(calc.previousInput, calc.currentInput, calc.operator);
                 
+                // Add to history
                 const calculation = {
                     id: Date.now(),
-                    expression: `${CalculatorState.formatResult(parseFloat(calc.previousInput))} ${calc.operator} ${CalculatorState.formatResult(parseFloat(calc.currentInput))}`,
+                    expression: `${calc.previousInput} ${calc.operator} ${calc.currentInput}`,
                     result: result,
                     timestamp: new Date().toLocaleString()
                 };
@@ -1112,7 +1130,7 @@
                 localStorage.setItem('calculatorHistory', JSON.stringify(calc.history));
                 updateHistoryDisplay();
                 
-                calc.currentInput = result.toString(); // Store raw string for internal use
+                calc.currentInput = result.toString();
                 calc.previousInput = '';
                 calc.operator = '';
                 calc.shouldResetDisplay = true;
@@ -1140,13 +1158,8 @@
         }
 
         function deleteLast() {
-            if (calc.currentInput === 'Error') {
-                clearAll();
-                return;
-            }
-            const currentRawInput = calc.currentInput.replace(/,/g, '');
-            if (currentRawInput.length > 1) {
-                calc.currentInput = currentRawInput.slice(0, -1);
+            if (calc.currentInput.length > 1) {
+                calc.currentInput = calc.currentInput.slice(0, -1);
             } else {
                 calc.currentInput = '0';
             }
@@ -1155,45 +1168,28 @@
 
         // Enhanced Scientific Functions
         function scientificFunction(func) {
-            if (calc.currentInput === '' || calc.currentInput === '0' || calc.currentInput === 'Error') return;
+            if (calc.currentInput === '' || calc.currentInput === '0') return;
             
-            const value = parseFloat(calc.currentInput.replace(/,/g, ''));
+            const value = parseFloat(calc.currentInput);
             let result;
             
             try {
                 switch (func) {
-                    case 'sin': result = Math.sin(value * Math.PI / 180); break; // Degrees to Radians
+                    case 'sin': result = Math.sin(value * Math.PI / 180); break;
                     case 'cos': result = Math.cos(value * Math.PI / 180); break;
                     case 'tan': result = Math.tan(value * Math.PI / 180); break;
-                    case 'asin': 
-                        if (value < -1 || value > 1) throw new Error('Domain error');
-                        result = Math.asin(value) * 180 / Math.PI; break;
-                    case 'acos':
-                        if (value < -1 || value > 1) throw new Error('Domain error');
-                        result = Math.acos(value) * 180 / Math.PI; break;
+                    case 'asin': result = Math.asin(value) * 180 / Math.PI; break;
+                    case 'acos': result = Math.acos(value) * 180 / Math.PI; break;
                     case 'atan': result = Math.atan(value) * 180 / Math.PI; break;
-                    case 'log': 
-                        if (value <= 0) throw new Error('Domain error');
-                        result = Math.log10(value); break;
-                    case 'ln': 
-                        if (value <= 0) throw new Error('Domain error');
-                        result = Math.log(value); break;
-                    case 'sqrt': 
-                        if (value < 0) throw new Error('Domain error');
-                        result = Math.sqrt(value); break;
+                    case 'log': result = Math.log10(value); break;
+                    case 'ln': result = Math.log(value); break;
+                    case 'sqrt': result = Math.sqrt(value); break;
                     case 'cbrt': result = Math.cbrt(value); break;
                     case 'square': result = value * value; break;
                     case 'cube': result = value * value * value; break;
-                    case 'factorial': 
-                        result = factorial(value);
-                        if (isNaN(result)) throw new Error('Factorial error');
-                        break;
-                    case 'inverse': 
-                        if (value === 0) throw new Error('Division by zero');
-                        result = 1 / value; break;
+                    case 'factorial': result = factorial(value); break;
+                    case 'inverse': result = 1 / value; break;
                     case 'percent': result = value / 100; break;
-                    case 'pi': calc.currentInput = Math.PI.toString(); updateDisplay(); return;
-                    case 'e': calc.currentInput = Math.E.toString(); updateDisplay(); return;
                     case 'negate': result = -value; break;
                     default: return;
                 }
@@ -1209,10 +1205,8 @@
         }
 
         function factorial(n) {
-            if (n < 0 || n !== Math.floor(n)) return NaN; // Only non-negative integers
+            if (n < 0 || n !== Math.floor(n) || n > 170) return NaN;
             if (n === 0 || n === 1) return 1;
-            // For larger numbers, consider BigInt or a dedicated math library
-            if (n > 20) return Infinity; // JS numbers can't represent factorial beyond this
             let result = 1;
             for (let i = 2; i <= n; i++) {
                 result *= i;
@@ -1221,7 +1215,41 @@
         }
 
         // Scientific Mode Toggle
+        const scientificButtonsConfig = [
+            // Row 1
+            { text: 'sin', func: 'scientificFunction("sin")', class: 'btn scientific' },
+            { text: 'cos', func: 'scientificFunction("cos")', class: 'btn scientific' },
+            { text: 'tan', func: 'scientificFunction("tan")', class: 'btn scientific' },
+            { text: 'asin', func: 'scientificFunction("asin")', class: 'btn scientific' },
+            { text: 'acos', func: 'scientificFunction("acos")', class: 'btn scientific' },
+            { text: 'atan', func: 'scientificFunction("atan")', class: 'btn scientific' },
+            
+            // Row 2
+            { text: 'log', func: 'scientificFunction("log")', class: 'btn scientific' },
+            { text: 'ln', func: 'scientificFunction("ln")', class: 'btn scientific' },
+            { text: 'xʸ', func: 'inputOperator("^")', class: 'btn scientific' },
+            { text: 'mod', func: 'inputOperator("mod")', class: 'btn scientific' },
+            { text: '√', func: 'scientificFunction("sqrt")', class: 'btn scientific' },
+            { text: '³√', func: 'scientificFunction("cbrt")', class: 'btn scientific' },
+
+            // Row 3
+            { text: 'x²', func: 'scientificFunction("square")', class: 'btn scientific' },
+            { text: 'x³', func: 'scientificFunction("cube")', class: 'btn scientific' },
+            { text: 'x!', func: 'scientificFunction("factorial")', class: 'btn scientific' },
+            { text: '1/x', func: 'scientificFunction("inverse")', class: 'btn scientific' },
+            { text: '+/-', func: 'scientificFunction("negate")', class: 'btn scientific' },
+            { text: '%', func: 'scientificFunction("percent")', class: 'btn scientific' },
+
+            // Row 4
+            { text: 'π', func: 'inputNumber("3.14159265359")', class: 'btn scientific' },
+            { text: 'e', func: 'inputNumber("2.71828182846")', class: 'btn scientific' }
+        ];
+
         function toggleScientific() {
+            if (calc.isConverterMode) { // If converter is active, switch to calculator first
+                toggleConverterView();
+            }
+
             calc.isScientificMode = !calc.isScientificMode;
             buttonsGrid.classList.toggle('scientific', calc.isScientificMode);
             scientificToggleText.textContent = calc.isScientificMode ? 'Standard' : 'Scientific';
@@ -1237,61 +1265,18 @@
         function addScientificButtons() {
             removeScientificButtons(); // Ensure no duplicates
             
-            const scientificButtonsConfig = [
-                { text: 'sin', func: 'scientificFunction("sin")', class: 'btn scientific-func' },
-                { text: 'cos', func: 'scientificFunction("cos")', class: 'btn scientific-func' },
-                { text: 'tan', func: 'scientificFunction("tan")', class: 'btn scientific-func' },
-                { text: 'log', func: 'scientificFunction("log")', class: 'btn scientific-func' },
-                { text: 'ln', func: 'scientificFunction("ln")', class: 'btn scientific-func' },
-                { text: 'xʸ', func: 'inputOperator("^")', class: 'btn scientific-func' },
-                { text: '√x', func: 'scientificFunction("sqrt")', class: 'btn scientific-func' },
-                { text: 'x²', func: 'scientificFunction("square")', class: 'btn scientific-func' },
-                { text: 'x!', func: 'scientificFunction("factorial")', class: 'btn scientific-func' },
-                { text: 'π', func: 'scientificFunction("pi")', class: 'btn scientific-func' },
-                { text: 'e', func: 'scientificFunction("e")', class: 'btn scientific-func' },
-                { text: '1/x', func: 'scientificFunction("inverse")', class: 'btn scientific-func' },
-                { text: '%', func: 'scientificFunction("percent")', class: 'btn scientific-func' },
-                { text: '±', func: 'scientificFunction("negate")', class: 'btn scientific-func' },
-                { text: 'mod', func: 'inputOperator("mod")', class: 'btn scientific-func' }
-            ];
-            
-            // Create a temporary div to hold all scientific buttons for easier insertion
-            const tempDiv = document.createElement('div');
             scientificButtonsConfig.forEach(btnConfig => {
                 const button = document.createElement('button');
                 button.className = btnConfig.class;
                 button.textContent = btnConfig.text;
                 button.setAttribute('onclick', btnConfig.func);
-                tempDiv.appendChild(button);
-                calc.scientificButtons.push(button); // Keep reference to remove later
+                buttonsGrid.insertBefore(button, buttonsGrid.children[0]); // Insert at the beginning for dynamic layout
             });
-
-            // Insert scientific buttons:
-            // Insert 3 at the start (before AC)
-            for (let i = 0; i < 3 && tempDiv.children.length > 0; i++) {
-                buttonsGrid.insertBefore(tempDiv.children[0], buttonsGrid.children[0]);
-            }
-            // Insert 3 after ÷
-            for (let i = 0; i < 3 && tempDiv.children.length > 0; i++) {
-                buttonsGrid.insertBefore(tempDiv.children[0], buttonsGrid.children[8]);
-            }
-            // Insert 3 after ×
-            for (let i = 0; i < 3 && tempDiv.children.length > 0; i++) {
-                buttonsGrid.insertBefore(tempDiv.children[0], buttonsGrid.children[13]);
-            }
-            // Insert 3 after −
-            for (let i = 0; i < 3 && tempDiv.children.length > 0; i++) {
-                buttonsGrid.insertBefore(tempDiv.children[0], buttonsGrid.children[18]);
-            }
-            // Insert remaining (%, ±, mod) before 0
-            while (tempDiv.children.length > 0) {
-                buttonsGrid.insertBefore(tempDiv.children[0], buttonsGrid.children[buttonsGrid.children.length - 3]);
-            }
         }
 
         function removeScientificButtons() {
-            calc.scientificButtons.forEach(btn => btn.remove());
-            calc.scientificButtons = []; // Clear the array
+            const scientificBtns = document.querySelectorAll('.btn.scientific');
+            scientificBtns.forEach(btn => btn.remove());
         }
 
         // Menu Functions
@@ -1322,7 +1307,7 @@
             }
             
             historyList.innerHTML = calc.history.map(item => `
-                <div class="history-item" onclick="useHistoryResult('${item.result.replace(/'/g, "\\'")}')" tabindex="0" role="button" aria-label="Use result ${item.result} for new calculation">
+                <div class="history-item" onclick="useHistoryResult('${item.result}')">
                     <div class="history-expression">${item.expression}</div>
                     <div class="history-result">= ${item.result}</div>
                     <div style="color: #666; font-size: 12px; margin-top: 4px;">${item.timestamp}</div>
@@ -1332,7 +1317,6 @@
 
         function useHistoryResult(result) {
             calc.currentInput = result.replace(/,/g, ''); // Remove commas for calculations
-            calc.shouldResetDisplay = true; // Ensures next number input starts fresh
             updateDisplay();
             toggleHistory();
         }
@@ -1343,7 +1327,7 @@
             updateHistoryDisplay();
         }
 
-        // Enhanced Unit Converter
+        // Unit Converter Functions (Modified for in-place view)
         const conversionData = {
             length: {
                 meter: 1,
@@ -1360,14 +1344,14 @@
                 gram: 1000,
                 pound: 2.20462,
                 ounce: 35.274,
-                metric_ton: 0.001, // Added for clarity
+                ton: 0.001,
                 stone: 0.157473
             },
             temperature: {
-                celsius: { toBase: (val) => val, fromBase: (val) => val },
-                fahrenheit: { toBase: (val) => (val - 32) * 5/9, fromBase: (val) => val * 9/5 + 32 },
-                kelvin: { toBase: (val) => val - 273.15, fromBase: (val) => val + 273.15 },
-                rankine: { toBase: (val) => (val - 491.67) * 5/9, fromBase: (val) => (val * 9/5) + 491.67 }
+                celsius: { base: true },
+                fahrenheit: { formula: 'f' },
+                kelvin: { formula: 'k' },
+                rankine: { formula: 'r' }
             },
             volume: {
                 liter: 1,
@@ -1376,7 +1360,7 @@
                 quart: 1.05669,
                 pint: 2.11338,
                 cup: 4.22675,
-                fluid_ounce: 33.814 // Renamed for clarity
+                ounce: 33.814
             }
         };
 
@@ -1396,7 +1380,7 @@
                 { value: 'gram', label: 'Gram (g)' },
                 { value: 'pound', label: 'Pound (lb)' },
                 { value: 'ounce', label: 'Ounce (oz)' },
-                { value: 'metric_ton', label: 'Metric Ton (t)' },
+                { value: 'ton', label: 'Ton (t)' },
                 { value: 'stone', label: 'Stone (st)' }
             ],
             temperature: [
@@ -1412,54 +1396,55 @@
                 { value: 'quart', label: 'Quart (qt)' },
                 { value: 'pint', label: 'Pint (pt)' },
                 { value: 'cup', label: 'Cup' },
-                { value: 'fluid_ounce', label: 'Fluid Ounce (fl oz)' }
+                { value: 'ounce', label: 'Fluid Ounce (fl oz)' }
             ]
         };
 
-        function toggleConverter() {
-            const converterPanel = document.getElementById('converterPanel');
-            converterPanel.classList.toggle('active');
-            if (converterPanel.classList.contains('active')) {
-                updateConverter(); // Initialize/refresh converter options
-                // Clear input and result when opening
-                document.getElementById('converterInput').value = '';
-                document.getElementById('converterResult').textContent = '0';
+        function toggleConverterView() {
+            calc.isConverterMode = !calc.isConverterMode;
+            
+            if (calc.isConverterMode) {
+                // Hide calculator buttons, show converter
+                buttonsGrid.classList.add('hidden-section');
+                converterSection.classList.remove('hidden-section');
+                updateConverter(); // Ensure converter dropdowns are populated
+            } else {
+                // Show calculator buttons, hide converter
+                buttonsGrid.classList.remove('hidden-section');
+                converterSection.classList.add('hidden-section');
+                // Ensure scientific mode state is correctly reflected if coming back to calculator
+                if (calc.isScientificMode) {
+                    addScientificButtons();
+                } else {
+                    removeScientificButtons();
+                }
             }
             closeMenu();
         }
 
         function updateConverter() {
             const type = document.getElementById('converterType').value;
-            const fromUnitSelect = document.getElementById('fromUnit');
-            const toUnitSelect = document.getElementById('toUnit');
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
             
             const units = unitOptions[type];
             
-            fromUnitSelect.innerHTML = '';
-            toUnitSelect.innerHTML = '';
+            fromUnit.innerHTML = '';
+            toUnit.innerHTML = '';
             
             units.forEach(unit => {
-                const optionFrom = document.createElement('option');
-                optionFrom.value = unit.value;
-                optionFrom.textContent = unit.label;
-                fromUnitSelect.appendChild(optionFrom);
-
-                const optionTo = document.createElement('option');
-                optionTo.value = unit.value;
-                optionTo.textContent = unit.label;
-                toUnitSelect.appendChild(optionTo);
+                fromUnit.innerHTML += `<option value="${unit.value}">${unit.label}</option>`;
+                toUnit.innerHTML += `<option value="${unit.value}">${unit.label}</option>`;
             });
             
-            // Set default values for `toUnit` to be different from `fromUnit` if possible
+            // Set default values
             if (units.length > 1) {
-                fromUnitSelect.selectedIndex = 0;
-                toUnitSelect.selectedIndex = 1; // Default to second unit
-            } else {
-                fromUnitSelect.selectedIndex = 0;
-                toUnitSelect.selectedIndex = 0;
+                toUnit.selectedIndex = 1;
             }
             
-            convertValue(); // Perform conversion with new units
+            document.getElementById('converterInput').value = '';
+            document.getElementById('converterResult').textContent = '0';
+            convertValue();
         }
 
         function convertValue() {
@@ -1473,19 +1458,11 @@
             
             try {
                 if (type === 'temperature') {
-                    // Convert from 'fromUnit' to Celsius (base)
-                    let baseValue = conversionData.temperature[fromUnit].toBase(value);
-                    // Convert from Celsius (base) to 'toUnit'
-                    result = conversionData.temperature[toUnit].fromBase(baseValue);
+                    result = convertTemperature(value, fromUnit, toUnit);
                 } else {
                     const data = conversionData[type];
                     if (data && data[fromUnit] && data[toUnit]) {
-                        // Convert 'fromUnit' to base unit (factor is its value relative to base)
-                        const valueInBaseUnit = value / data[fromUnit];
-                        // Convert from base unit to 'toUnit'
-                        result = valueInBaseUnit * data[toUnit];
-                    } else {
-                        throw new Error('Invalid units for conversion');
+                        result = (value / data[fromUnit]) * data[toUnit];
                     }
                 }
                 
@@ -1495,47 +1472,59 @@
             }
         }
 
+        function convertTemperature(value, from, to) {
+            let celsius = value;
+            
+            // Convert to Celsius first
+            switch (from) {
+                case 'fahrenheit':
+                    celsius = (value - 32) * 5/9;
+                    break;
+                case 'kelvin':
+                    celsius = value - 273.15;
+                    break;
+                case 'rankine':
+                    celsius = (value - 491.67) * 5/9;
+                    break;
+            }
+            
+            // Convert from Celsius to target
+            switch (to) {
+                case 'fahrenheit':
+                    return celsius * 9/5 + 32;
+                case 'kelvin':
+                    return celsius + 273.15;
+                case 'rankine':
+                    return (celsius + 273.15) * 9/5;
+                default:
+                    return celsius;
+            }
+        }
+
         // Enhanced Event Listeners
         menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent document click from closing it immediately
+            e.stopPropagation();
             toggleMenu();
         });
 
         document.addEventListener('click', (e) => {
-            // Close menu if click is outside the menu button and dropdown
-            if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            // Close menu if click outside dropdown AND not on menu button
+            if (!dropdownMenu.contains(e.target) && e.target !== menuBtn) {
                 closeMenu();
             }
-            // Close panels if click is outside panels and their toggle buttons
-            const historyPanel = document.getElementById('historyPanel');
-            const converterPanel = document.getElementById('converterPanel');
-            const isClickInsidePanel = historyPanel.contains(e.target) || converterPanel.contains(e.target);
-            const isClickOnMenuDropdownItem = e.target.closest('.dropdown-item');
-
-            if (!isClickInsidePanel && !isClickOnMenuDropdownItem) {
-                if (historyPanel.classList.contains('active')) {
-                    toggleHistory();
-                }
-                if (converterPanel.classList.contains('active')) {
-                    toggleConverter();
-                }
+            // Close panels if click outside calculator (which is now the parent of converter and buttons)
+            if (!calculator.contains(e.target) && historyPanel.classList.contains('active')) {
+                historyPanel.classList.remove('active');
             }
         });
 
         // Enhanced Keyboard Support
         document.addEventListener('keydown', (event) => {
+            // Only allow keyboard input if converter is NOT active
+            if (calc.isConverterMode) return;
+
             const key = event.key;
             
-            // Prevent interference if a panel is active
-            if (document.getElementById('historyPanel').classList.contains('active') ||
-                document.getElementById('converterPanel').classList.contains('active')) {
-                if (key === 'Escape') {
-                    if (document.getElementById('historyPanel').classList.contains('active')) toggleHistory();
-                    if (document.getElementById('converterPanel').classList.contains('active')) toggleConverter();
-                }
-                return; // Do not process calculator inputs if panel is open
-            }
-
             if (key >= '0' && key <= '9') {
                 inputNumber(key);
             } else if (key === '.') {
@@ -1543,16 +1532,14 @@
             } else if (key === '+') {
                 inputOperator('+');
             } else if (key === '-') {
-                inputOperator('−'); // Using unicode minus as in your original HTML
+                inputOperator('−');
             } else if (key === '*') {
-                inputOperator('×'); // Using unicode multiply as in your original HTML
+                inputOperator('×');
             } else if (key === '/') {
-                event.preventDefault(); // Prevent browser quick-search with '/'
-                inputOperator('÷'); // Using unicode divide as in your original HTML
-            } else if (key === 'Enter') {
-                event.preventDefault(); // Prevent default form submission or other behaviors
-                calculate();
-            } else if (key === '=') { // Allow '=' key as well
+                event.preventDefault();
+                inputOperator('÷');
+            } else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
                 calculate();
             } else if (key === 'Escape') {
                 clearAll();
@@ -1566,9 +1553,8 @@
         // Initialize Calculator
         function init() {
             updateDisplay();
-            updateConverter(); // Initialize converter dropdowns
-            updateHistoryDisplay(); // Initialize history display
-
+            updateConverter(); /* Initial update for converter dropdowns */
+            
             // Add loading animation
             calculator.style.opacity = '0';
             calculator.style.transform = 'translateY(30px)';
