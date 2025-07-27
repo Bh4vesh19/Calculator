@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Calculator</title>
+    <title>Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom dark theme and animations */
+        /* Enhanced dark theme and animations */
         body {
             background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
             min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
         }
         
         .transition-all { transition: all 0.3s ease; }
@@ -31,11 +34,17 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateZ(0);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
         
         .calc-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
         }
         
         .calc-btn:active {
@@ -43,7 +52,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
         }
         
-        /* Ripple effect */
+        /* Enhanced ripple effect */
         .calc-btn::before {
             content: '';
             position: absolute;
@@ -55,6 +64,7 @@
             background: rgba(255, 255, 255, 0.3);
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
+            pointer-events: none;
         }
         
         .calc-btn.ripple::before {
@@ -62,17 +72,25 @@
             height: 300px;
         }
         
-        /* Glow effects */
+        /* Enhanced glow effects */
         .glow {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .glow-green {
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .glow-orange {
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+            box-shadow: 0 0 25px rgba(249, 115, 22, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .glow-purple {
+            box-shadow: 0 0 25px rgba(147, 51, 234, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .glow-blue {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8), 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         /* Mode content transitions */
@@ -86,6 +104,7 @@
             transform: scale(0.9) translateY(20px);
             position: absolute;
             pointer-events: none;
+            width: 100%;
         }
         
         .mode-content.active {
@@ -95,92 +114,240 @@
             pointer-events: auto;
         }
         
-        /* Particle animation */
+        /* Enhanced particle animation */
         .particle {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 6px;
+            height: 6px;
             background: #3b82f6;
             border-radius: 50%;
             pointer-events: none;
-            animation: float 2s ease-out forwards;
+            animation: float 2.5s ease-out forwards;
+            z-index: 1000;
         }
         
         @keyframes float {
             0% {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0) scale(1) rotate(0deg);
             }
             100% {
                 opacity: 0;
-                transform: translateY(-100px) scale(0);
+                transform: translateY(-120px) scale(0) rotate(360deg);
             }
         }
         
         /* Shake animation for errors */
         .shake {
-            animation: shake 0.5s ease-in-out;
+            animation: shake 0.6s ease-in-out;
         }
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
         }
         
-        /* Pulse animation for display */
+        /* Enhanced pulse animation */
         .pulse {
-            animation: pulse 0.3s ease-in-out;
+            animation: pulse 0.4s ease-in-out;
         }
         
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
         
-        /* Swipe indicator */
-        .swipe-indicator {
+        /* Currency input enhancements - NO ARROW KEY INCREMENTING */
+        input[type="text"]::-webkit-outer-spin-button,
+        input[type="text"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+            display: none;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        /* Simplified currency input styling */
+        .currency-input {
+            background: #374151;
+            border: 1px solid #6b7280;
+            transition: all 0.2s ease;
+        }
+        
+        .currency-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        
+        /* Simplified select styling */
+        .currency-select {
+            background: #374151;
+            border: 1px solid #6b7280;
+            transition: all 0.2s ease;
+        }
+        
+        .currency-select:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        
+        /* Simplified result display */
+        .currency-result {
+            background: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        /* Scientific calculator enhancements */
+        .scientific-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .scientific-btn {
+            min-height: 3rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .scientific-btn-large {
+            min-height: 3.5rem;
+            font-size: 1rem;
+        }
+        
+        /* Custom ripple effect */
+        .ripple-effect {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple-expand 0.6s linear;
+            pointer-events: none;
         }
         
-        .swipe-indicator.show {
-            opacity: 1;
+        @keyframes ripple-expand {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
         }
         
-        /* Custom scrollbar for dark theme */
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
         
         ::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 5px;
         }
         
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
+            background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+            border-radius: 5px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: linear-gradient(180deg, #2563eb, #1e40af);
+        }
+        
+        /* Mobile enhancements */
+        @media (max-width: 640px) {
+            .calc-btn {
+                min-height: 3.5rem;
+                font-size: 1rem;
+            }
+            
+            .scientific-btn {
+                min-height: 2.5rem;
+                font-size: 0.7rem;
+            }
+            
+            .scientific-btn-large {
+                min-height: 3rem;
+                font-size: 0.9rem;
+            }
+            
+            .currency-input {
+                font-size: 18px; /* Prevents zoom on iOS */
+                padding: 1rem;
+            }
+            
+            .currency-select {
+                font-size: 16px;
+                padding: 1rem;
+            }
+        }
+        
+        /* Enhanced menu transitions */
+        .menu-item {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .menu-item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            transform: scale(1.02);
+        }
+        
+        /* History animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Enhanced responsive grid for scientific mode */
+        @media (max-width: 480px) {
+            .scientific-grid {
+                gap: 0.25rem;
+            }
+            
+            .scientific-btn {
+                min-height: 2.2rem;
+                font-size: 0.65rem;
+                padding: 0.25rem;
+            }
+        }
+
+        /* Country flag visibility fix */
+        .currency-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .currency-flag {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .currency-select:hover .currency-flag,
+        .currency-select:focus .currency-flag,
+        .currency-option:hover .currency-flag {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
     <div class="min-h-screen flex items-center justify-center p-2 sm:p-4 relative">
-        <div class="w-full max-w-sm sm:max-w-md bg-gray-900 rounded-2xl shadow-2xl overflow-hidden border border-gray-700 backdrop-blur-lg bg-opacity-95">
+        <div class="w-full max-w-sm sm:max-w-md lg:max-w-lg bg-gray-900 rounded-2xl shadow-2xl overflow-hidden border border-gray-700 backdrop-blur-lg bg-opacity-95">
             <!-- Header -->
             <div class="bg-gray-800 p-3 sm:p-4 flex items-center justify-between border-b border-gray-700">
                 <div class="flex items-center gap-3">
@@ -215,7 +382,7 @@
             <!-- Menu Dropdown -->
             <div id="menuDropdown" class="bg-gray-800 border-b border-gray-700 transition-all duration-300 overflow-hidden max-h-0 opacity-0">
                 <div class="p-3 sm:p-4 space-y-1 sm:space-y-2">
-                    <button data-mode="standard" class="mode-btn flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base bg-blue-600 text-white">
+                    <button data-mode="standard" class="mode-btn menu-item flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base bg-blue-600 text-white active">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <rect x="4" y="3" width="16" height="18" rx="2" ry="2"></rect>
                             <line x1="8" y1="7" x2="16" y2="7"></line>
@@ -225,25 +392,22 @@
                         </svg>
                         <span>Standard</span>
                     </button>
-                    <button data-mode="scientific" class="mode-btn flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base text-gray-300 hover:bg-gray-700">
+                    <button data-mode="scientific" class="mode-btn menu-item flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base text-gray-300 hover:bg-gray-700">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <rect x="4" y="3" width="16" height="18" rx="2" ry="2"></rect>
-                            <line x1="8" y1="7" x2="16" y2="7"></line>
-                            <line x1="8" y1="11" x2="12" y2="11"></line>
-                            <line x1="8" y1="15" x2="12" y2="15"></line>
-                            <line x1="16" y1="11" x2="16" y2="15"></line>
+                            <path d="M9 7h6l1 10-4-4-4 4 1-10z"></path>
+                            <circle cx="12" cy="5" r="2"></circle>
                         </svg>
                         <span>Scientific</span>
                     </button>
-                    <button data-mode="currency" class="mode-btn flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base text-gray-300 hover:bg-gray-700">
-                        <!-- Dollar Sign Icon -->
+                    <button data-mode="currency" class="mode-btn menu-item flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base text-gray-300 hover:bg-gray-700">
+                        <!-- Enhanced Dollar Sign Icon -->
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <line x1="12" y1="1" x2="12" y2="23"></line>
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                         </svg>
-                        <span>Currency</span>
+                        <span>Currency Converter</span>
                     </button>
-                    <button data-mode="history" class="mode-btn flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base text-gray-300 hover:bg-gray-700">
+                    <button data-mode="history" class="mode-btn menu-item flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base text-gray-300 hover:bg-gray-700">
                         <!-- History Icon -->
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -267,7 +431,7 @@
             </div>
 
             <!-- Content Area -->
-            <div class="p-3 sm:p-4 lg:p-6 bg-gray-900">
+            <div class="p-3 sm:p-4 lg:p-6 bg-gray-900 relative">
                 <!-- Standard Calculator -->
                 <div id="standardMode" class="mode-content active">
                     <div class="grid grid-cols-4 gap-2 sm:gap-3">
@@ -291,120 +455,125 @@
                         <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="3">3</button>
                         <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-orange-600 hover:bg-orange-500 text-white" data-action="operator" data-value="+">+</button>
 
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" style="grid-column: span 2;" data-action="number" data-value="0">0</button>
+                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200 col-span-2" data-action="number" data-value="0">0</button>
                         <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="decimal">.</button>
                         <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-green-600 hover:bg-green-500 text-white" data-action="calculate">=</button>
                     </div>
                 </div>
 
-                <!-- Scientific Calculator -->
+                <!-- FIXED Scientific Calculator -->
                 <div id="scientificMode" class="mode-content hidden">
-                    <div class="grid grid-cols-5 gap-1 sm:gap-2">
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="sin">sin</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="cos">cos</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="tan">tan</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="log">log</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="ln">ln</button>
+                    <div class="scientific-grid">
+                        <!-- Row 1: Advanced Functions -->
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="sin">sin</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="cos">cos</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="tan">tan</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="log">log</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="ln">ln</button>
 
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="sqrt">√</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="square">x²</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="factorial">x!</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="operator" data-value="^">xʸ</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="inverse">1/x</button>
+                        <!-- Row 2: More Functions -->
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="sqrt">√</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="square">x²</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="factorial">x!</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="operator" data-value="^">xʸ</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="inverse">1/x</button>
 
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="percent">%</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="3.14159">π</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="2.71828">e</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="(">(</button>
-                        <button class="calc-btn bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm h-10 sm:h-12 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value=")">)</button>
+                        <!-- Row 3: Constants and Brackets -->
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="scientific" data-value="percent">%</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="3.14159">π</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="2.71828">e</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="(">(</button>
+                        <button class="calc-btn scientific-btn bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value=")">)</button>
 
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="7">7</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="8">8</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="9">9</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-orange-600 hover:bg-orange-500 text-white" data-action="operator" data-value="×">×</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-red-600 hover:bg-red-500 text-white" data-action="clear-all">AC</button>
+                        <!-- Row 4: Numbers and Operators -->
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="7">7</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="8">8</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="9">9</button>
+                        <button class="calc-btn scientific-btn-large bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="operator" data-value="×">×</button>
+                        <button class="calc-btn scientific-btn-large bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="clear-all">AC</button>
 
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="4">4</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="5">5</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="6">6</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-orange-600 hover:bg-orange-500 text-white" data-action="operator" data-value="−">−</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-red-600 hover:bg-red-500 text-white" data-action="clear-entry">CE</button>
+                        <!-- Row 5: Numbers and Operators -->
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="4">4</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="5">5</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="6">6</button>
+                        <button class="calc-btn scientific-btn-large bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="operator" data-value="−">−</button>
+                        <button class="calc-btn scientific-btn-large bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="clear-entry">CE</button>
 
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="1">1</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="2">2</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="number" data-value="3">3</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-orange-600 hover:bg-orange-500 text-white" data-action="operator" data-value="+">+</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="delete">⌫</button>
+                        <!-- Row 6: Numbers and Operators -->
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="1">1</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="2">2</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="number" data-value="3">3</button>
+                        <button class="calc-btn scientific-btn-large bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="operator" data-value="+">+</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="delete">⌫</button>
 
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" style="grid-column: span 2;" data-action="number" data-value="0">0</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-gray-700 hover:bg-gray-600 text-gray-200" data-action="decimal">.</button>
-                        <button class="calc-btn h-12 sm:h-14 lg:h-16 rounded-lg font-semibold text-sm sm:text-base lg:text-lg transition-all duration-200 transform hover:shadow-md touch-manipulation bg-green-600 hover:bg-green-500 text-white" style="grid-column: span 2;" data-action="calculate">=</button>
+                        <!-- Row 7: Zero, Decimal, Equals -->
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation col-span-2" data-action="number" data-value="0">0</button>
+                        <button class="calc-btn scientific-btn-large bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation" data-action="decimal">.</button>
+                        <button class="calc-btn scientific-btn-large bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-md touch-manipulation col-span-2" data-action="calculate">=</button>
                     </div>
                 </div>
 
-                <!-- Currency Converter -->
+                <!-- Simplified Currency Converter -->
                 <div id="currencyMode" class="mode-content hidden">
                     <div class="space-y-4">
-                        <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">Currency Converter</h3>
+                        <div class="text-center">
+                            <h3 class="text-xl font-bold text-white mb-2">Currency Converter</h3>
+                        </div>
                         
-                        <div class="space-y-3">
+                        <div class="space-y-4">
+                            <!-- Amount Input -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Amount</label>
                                 <input
-                                    type="number"
+                                    type="text"
+                                    inputmode="decimal"
                                     id="currencyAmount"
                                     value="1"
-                                    class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="Enter amount"
+                                    class="currency-input w-full px-3 py-3 rounded-lg text-white"
+                                    placeholder="Enter amount..."
                                 />
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
+                            <!-- Currency Selection -->
+                            <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">From</label>
-                                    <select
-                                        id="currencyFrom"
-                                        class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    >
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="GBP">GBP</option>
-                                        <option value="JPY">JPY</option>
-                                        <option value="INR">INR</option>
-                                        <option value="CAD">CAD</option>
-                                        <option value="AUD">AUD</option>
-                                        <option value="CNY">CNY</option>
-                                        <option value="CHF">CHF</option>
-                                        <option value="SEK">SEK</option>
+                                    <select id="currencyFrom" class="currency-select w-full px-3 py-3 rounded-lg text-white">
+                                        <option value="USD">USD - US Dollar</option>
+                                        <option value="EUR">EUR - Euro</option>
+                                        <option value="GBP">GBP - British Pound</option>
+                                        <option value="JPY">JPY - Japanese Yen</option>
+                                        <option value="INR">INR - Indian Rupee</option>
+                                        <option value="CAD">CAD - Canadian Dollar</option>
+                                        <option value="AUD">AUD - Australian Dollar</option>
+                                        <option value="CNY">CNY - Chinese Yuan</option>
+                                        <option value="CHF">CHF - Swiss Franc</option>
+                                        <option value="SEK">SEK - Swedish Krona</option>
                                     </select>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">To</label>
-                                    <select
-                                        id="currencyTo"
-                                        class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    >
-                                        <option value="USD">USD</option>
-                                        <option value="EUR" selected>EUR</option>
-                                        <option value="GBP">GBP</option>
-                                        <option value="JPY">JPY</option>
-                                        <option value="INR">INR</option>
-                                        <option value="CAD">CAD</option>
-                                        <option value="AUD">AUD</option>
-                                        <option value="CNY">CNY</option>
-                                        <option value="CHF">CHF</option>
-                                        <option value="SEK">SEK</option>
+                                    <select id="currencyTo" class="currency-select w-full px-3 py-3 rounded-lg text-white">
+                                        <option value="USD">USD - US Dollar</option>
+                                        <option value="EUR" selected>EUR - Euro</option>
+                                        <option value="GBP">GBP - British Pound</option>
+                                        <option value="JPY">JPY - Japanese Yen</option>
+                                        <option value="INR">INR - Indian Rupee</option>
+                                        <option value="CAD">CAD - Canadian Dollar</option>
+                                        <option value="AUD">AUD - Australian Dollar</option>
+                                        <option value="CNY">CNY - Chinese Yuan</option>
+                                        <option value="CHF">CHF - Swiss Franc</option>
+                                        <option value="SEK">SEK - Swedish Krona</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div id="currencyResultContainer" class="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-600">
+                            <!-- Result Display -->
+                            <div class="currency-result mt-4 p-4 rounded-lg">
                                 <div class="text-center">
-                                    <div id="currencyResult" class="text-xl sm:text-2xl font-bold text-green-400">0.92 EUR</div>
-                                    <div class="text-sm text-gray-400 mt-1">
-                                        <span id="currencyAmountText">1</span> <span id="currencyFromText">USD</span> equals
-                                    </div>
+                                    <div class="text-sm text-green-200 mb-1">Converted Amount</div>
+                                    <div id="currencyResult" class="text-2xl font-bold text-green-100">0.92 EUR</div>
                                 </div>
                             </div>
                         </div>
@@ -431,11 +600,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Swipe Indicator -->
-            <div class="swipe-indicator" id="swipeIndicator">
-                👆 Tap and hold for options
             </div>
         </div>
     </div>
@@ -478,7 +642,6 @@
         const menuDropdown = document.getElementById('menuDropdown');
         const menuIcon = document.getElementById('menuIcon');
         const closeIcon = document.getElementById('closeIcon');
-        const swipeIndicator = document.getElementById('swipeIndicator');
 
         // Enhanced animations
         function createRippleEffect(element, event) {
@@ -502,38 +665,43 @@
 
         function createParticles(element) {
             const rect = element.getBoundingClientRect();
-            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
             
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 8; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.background = colors[Math.floor(Math.random() * colors.length)];
                 particle.style.left = (rect.left + rect.width / 2) + 'px';
                 particle.style.top = (rect.top + rect.height / 2) + 'px';
-                particle.style.transform = `translate(${Math.random() * 60 - 30}px, ${Math.random() * 60 - 30}px)`;
+                particle.style.transform = `translate(${Math.random() * 80 - 40}px, ${Math.random() * 80 - 40}px)`;
+                particle.style.animationDelay = `${Math.random() * 0.5}s`;
                 
                 document.body.appendChild(particle);
                 
                 setTimeout(() => {
                     particle.remove();
-                }, 2000);
+                }, 2500);
             }
         }
 
         function animateButton(button, type = 'default') {
             button.classList.add('ripple');
             
-            // Add glow effect based on button type
+            // Enhanced glow effects
             if (type === 'calculate') {
                 button.classList.add('glow-green');
             } else if (type === 'operator') {
                 button.classList.add('glow-orange');
+            } else if (type === 'currency') {
+                button.classList.add('glow-purple');
+            } else if (type === 'scientific') {
+                button.classList.add('glow-blue');
             } else {
                 button.classList.add('glow');
             }
             
             setTimeout(() => {
-                button.classList.remove('ripple', 'glow', 'glow-green', 'glow-orange');
+                button.classList.remove('ripple', 'glow', 'glow-green', 'glow-orange', 'glow-purple', 'glow-blue');
             }, 600);
         }
 
@@ -541,14 +709,14 @@
             currentDisplay.classList.add('pulse');
             setTimeout(() => {
                 currentDisplay.classList.remove('pulse');
-            }, 300);
+            }, 400);
         }
 
         function shakeDisplay() {
             currentDisplay.classList.add('shake');
             setTimeout(() => {
                 currentDisplay.classList.remove('shake');
-            }, 500);
+            }, 600);
         }
 
         // Update display with animation
@@ -681,7 +849,7 @@
             return res;
         }
 
-        // Convert currency with animation
+        // Simplified Currency Converter
         function convertCurrency() {
             const amount = parseFloat(document.getElementById('currencyAmount').value) || 0;
             const from = document.getElementById('currencyFrom').value;
@@ -689,17 +857,54 @@
             
             const result = (amount / currencyRates[from]) * currencyRates[to];
             
-            // Animate the result update
-            const resultElement = document.getElementById('currencyResult');
-            resultElement.style.transform = 'scale(1.1)';
-            resultElement.textContent = `${result.toFixed(2)} ${to}`;
+            document.getElementById('currencyResult').textContent = `${result.toFixed(2)} ${to}`;
+        }
+
+        // Simplified input handling
+        function setupCurrencyInput() {
+            const input = document.getElementById('currencyAmount');
             
-            setTimeout(() => {
-                resultElement.style.transform = 'scale(1)';
-            }, 200);
-            
-            document.getElementById('currencyAmountText').textContent = amount;
-            document.getElementById('currencyFromText').textContent = from;
+            // Disable arrow key incrementing
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                const allowedKeys = [
+                    'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                    'ArrowLeft', 'ArrowRight', 'Home', 'End'
+                ];
+                
+                const isNumber = /^[0-9]$/.test(e.key);
+                const isDecimal = e.key === '.' && !input.value.includes('.');
+                
+                if (!allowedKeys.includes(e.key) && !isNumber && !isDecimal) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            input.addEventListener('input', function(e) {
+                let value = e.target.value;
+                value = value.replace(/[^0-9.]/g, '');
+                
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                
+                if (parts[1] && parts[1].length > 4) {
+                    value = parts[0] + '.' + parts[1].substring(0, 4);
+                }
+                
+                if (value.length > 12) {
+                    value = value.substring(0, 12);
+                }
+                
+                e.target.value = value;
+                convertCurrency();
+            });
         }
 
         // Update history display with animations
@@ -714,7 +919,7 @@
                 clearBtn.classList.remove('hidden');
                 container.innerHTML = history.map((item, index) => `
                     <div class="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-all duration-200 cursor-pointer border border-gray-600 transform hover:scale-105"
-                         onclick="setCurrentInput('${item.result}')" style="animation-delay: ${index * 0.1}s">
+                         onclick="setCurrentInput('${item.result}')" style="animation: slideIn 0.3s ease forwards; animation-delay: ${index * 0.1}s; opacity: 0;">
                         <div class="text-gray-200 font-medium text-sm sm:text-base">
                             ${item.expression} = ${item.result}
                         </div>
@@ -770,13 +975,13 @@
             
             // Update mode buttons
             document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.remove('bg-blue-600', 'text-white', 'active');
                 btn.classList.add('text-gray-300', 'hover:bg-gray-700');
             });
             
             const activeBtn = document.querySelector(`[data-mode="${mode}"]`);
             activeBtn.classList.remove('text-gray-300', 'hover:bg-gray-700');
-            activeBtn.classList.add('bg-blue-600', 'text-white');
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'active');
             
             // Animate the button
             activeBtn.style.transform = 'scale(1.05)';
@@ -789,11 +994,14 @@
             
             // Auto-convert currency if in currency mode
             if (mode === 'currency') {
-                setTimeout(convertCurrency, 300);
+                setTimeout(() => {
+                    convertCurrency();
+                    setupCurrencyInput();
+                }, 300);
             }
         }
 
-        // Touch and gesture handling
+        // Enhanced touch handling
         function handleTouchStart(e) {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
@@ -802,11 +1010,9 @@
             if (e.target.classList.contains('calc-btn')) {
                 longPressTimer = setTimeout(() => {
                     isLongPress = true;
-                    // Vibrate if supported
                     if (navigator.vibrate) {
                         navigator.vibrate(50);
                     }
-                    showSwipeIndicator();
                     createParticles(e.target);
                 }, 500);
             }
@@ -827,7 +1033,6 @@
             }
             
             isLongPress = false;
-            hideSwipeIndicator();
         }
 
         function handleSwipe() {
@@ -861,14 +1066,6 @@
             switchMode(modes[prevIndex]);
         }
 
-        function showSwipeIndicator() {
-            swipeIndicator.classList.add('show');
-        }
-
-        function hideSwipeIndicator() {
-            swipeIndicator.classList.remove('show');
-        }
-
         // Event listeners
         menuToggle.addEventListener('click', toggleMenu);
 
@@ -893,6 +1090,7 @@
                 let buttonType = 'default';
                 if (action === 'calculate') buttonType = 'calculate';
                 else if (action === 'operator') buttonType = 'operator';
+                else if (action === 'scientific') buttonType = 'scientific';
                 
                 animateButton(e.target, buttonType);
                 
@@ -930,29 +1128,14 @@
             }
         });
 
-        // Touch event listeners for gestures
+        // Touch event listeners for enhanced gestures
         document.addEventListener('touchstart', handleTouchStart, { passive: true });
         document.addEventListener('touchmove', handleTouchMove, { passive: true });
         document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
-        // Currency converter listeners with enhanced feedback
-        document.getElementById('currencyAmount').addEventListener('input', (e) => {
-            e.target.style.transform = 'scale(1.02)';
-            setTimeout(() => {
-                e.target.style.transform = 'scale(1)';
-            }, 150);
-            convertCurrency();
-        });
-
-        document.getElementById('currencyFrom').addEventListener('change', (e) => {
-            animateButton(e.target);
-            convertCurrency();
-        });
-
-        document.getElementById('currencyTo').addEventListener('change', (e) => {
-            animateButton(e.target);
-            convertCurrency();
-        });
+        // Currency converter listeners
+        document.getElementById('currencyFrom').addEventListener('change', convertCurrency);
+        document.getElementById('currencyTo').addEventListener('change', convertCurrency);
 
         // Clear history button with animation
         document.getElementById('clearHistoryBtn').addEventListener('click', (e) => {
@@ -973,10 +1156,14 @@
             }, historyItems.length * 50 + 200);
         });
 
-        // Enhanced keyboard support
+        // Enhanced keyboard support with no arrow key conflicts
         document.addEventListener('keydown', (e) => {
+            // Skip if focused on currency input
+            if (document.activeElement.id === 'currencyAmount') {
+                return;
+            }
+            
             const key = e.key;
-            e.preventDefault();
             
             // Find and animate the corresponding button
             let buttonSelector = '';
@@ -1007,44 +1194,22 @@
             
             // Animate the corresponding button
             if (buttonSelector) {
+                e.preventDefault();
                 const button = document.querySelector(buttonSelector);
                 if (button) {
                     animateButton(button);
-                    createRippleEffect(button, { clientX: button.offsetLeft + button.offsetWidth / 2, clientY: button.offsetTop + button.offsetHeight / 2 });
+                    createRippleEffect(button, { 
+                        clientX: button.offsetLeft + button.offsetWidth / 2, 
+                        clientY: button.offsetTop + button.offsetHeight / 2 
+                    });
                 }
             }
         });
 
-        // Add CSS for ripple effect
-        const style = document.createElement('style');
-        style.textContent = `
-            .ripple-effect {
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.3);
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                pointer-events: none;
-            }
-            
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
         // Initialize
         updateDisplay();
         convertCurrency();
-        
-        // Show initial tip
-        setTimeout(() => {
-            showSwipeIndicator();
-            setTimeout(hideSwipeIndicator, 2000);
-        }, 1000);
+        setupCurrencyInput();
     </script>
 </body>
 </html>
